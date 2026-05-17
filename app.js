@@ -68,6 +68,8 @@ const T = {
     voice_selected_fr:"voix FR choisie",
     voice_selected_en:"voix EN choisie",
     voice_set:        "Voix",
+    use_voice_fr:     "Utiliser FR",
+    use_voice_en:     "Utiliser EN",
     file_not_found:   "introuvable",
     voices_available: "Voix disponibles sur cet appareil",
     voices_test_desc: "Cliquez sur une voix pour la tester (🇫🇷 \"grenouille\" · 🇬🇧 \"squirrel\"). Choisissez ensuite la voix souhaitée ci-dessous.",
@@ -139,6 +141,8 @@ const T = {
     voice_selected_fr:"FR voice selected",
     voice_selected_en:"EN voice selected",
     voice_set:        "Voice",
+    use_voice_fr:     "Use FR",
+    use_voice_en:     "Use EN",
     file_not_found:   "not found",
     voices_available: "Available voices on this device",
     voices_test_desc: "Click a voice to test it (🇫🇷 \"grenouille\" · 🇬🇧 \"squirrel\"). Then select the voice you want below.",
@@ -280,6 +284,7 @@ function applyLang() {
   applyMode();
   document.getElementById('spellingInput').placeholder = t('input_placeholder');
   if (currentStatusKey) setTrainStatus(currentStatusKey);
+  renderVoiceList();
 }
 
 function setVoiceLang(l) {
@@ -815,11 +820,11 @@ function renderVoiceList() {
         ${isSelectedEn ? ` <span style="color:#1a55a0;font-size:0.75rem;">✅ ${t('voice_selected_en')}</span>` : ''}
       </div>
       <button class="btn btn-ghost btn-sm" style="font-size:0.75rem;padding:4px 10px;"
-        onclick="testVoice('${v.name.replace(/'/g, "\\'")}')">▶ Tester</button>
+        onclick="testVoice('${v.name.replace(/'/g, "\\'")}')">▶</button>
       ${isFr ? `<button class="btn btn-sm" style="font-size:0.75rem;padding:4px 10px;background:var(--success);color:white;"
-        onclick="selectVoice('${v.name.replace(/'/g, "\\'")}','fr')">✓ Utiliser FR</button>` : ''}
+        onclick="selectVoice('${v.name.replace(/'/g, "\\'")}','fr')">✓ ${t('use_voice_fr')}</button>` : ''}
       ${isEn ? `<button class="btn btn-sm" style="font-size:0.75rem;padding:4px 10px;background:#4a90e2;color:white;"
-        onclick="selectVoice('${v.name.replace(/'/g, "\\'")}','en')">✓ Utiliser EN</button>` : ''}`;
+        onclick="selectVoice('${v.name.replace(/'/g, "\\'")}','en')">✓ ${t('use_voice_en')}</button>` : ''}`;
     container.appendChild(row);
   });
   updateSelectedVoiceInfo();
