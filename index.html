@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LumiSpell</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="confetti-wrap" id="confettiWrap"></div>
+<div class="notif" id="notif"></div>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Lumi<span>Spell</span></div>
+    <div class="header-right">
+      <div class="lang-group">
+        <div class="lang-group-label" id="voiceLangLabel">Langue des mots</div>
+        <div class="lang-toggle" id="voiceLangToggle">
+          <button class="lang-btn active" data-vlang="fr" onclick="setVoiceLang('fr')">🇫🇷 FR</button>
+          <button class="lang-btn"        data-vlang="en" onclick="setVoiceLang('en')">🇬🇧 EN</button>
+        </div>
+      </div>
+      <div class="lang-group">
+        <div class="lang-group-label" id="uiLangLabel" data-t="ui_lang_label">Interface</div>
+        <div class="lang-toggle">
+          <button class="lang-btn active" data-lang="fr" onclick="setLang('fr')">FR</button>
+          <button class="lang-btn"        data-lang="en" onclick="setLang('en')">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="train" onclick="switchTab('train')">
+      <span class="icon">🎯</span> <span data-t="tab_train">Entraînement</span>
+    </button>
+    <button class="tab-btn" data-tab="words" onclick="switchTab('words')">
+      <span class="icon">📝</span> <span data-t="tab_words">Mots</span>
+    </button>
+    <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">
+      <span class="icon">📊</span> <span data-t="tab_stats">Stats</span>
+    </button>
+  </div>
+
+  <!-- ═══ TAB: TRAINING ═══ -->
+  <div class="tab-panel active" id="tab-train">
+
+    <!-- Score bar -->
+    <div class="score-bar">
+      <div class="score-card ok">
+        <div class="score-num" id="scoreOk">0</div>
+        <div class="score-label" data-t="score_correct">Corrects</div>
+      </div>
+      <div class="score-card fail">
+        <div class="score-num" id="scoreFail">0</div>
+        <div class="score-label" data-t="score_wrong">Erreurs</div>
+      </div>
+      <div class="score-card total">
+        <div class="score-num" id="scoreTotal">0</div>
+        <div class="score-label" data-t="score_total">Total</div>
+      </div>
+      <div class="score-card streak">
+        <div class="score-num" id="scoreStreak">0</div>
+        <div class="score-label" data-t="score_streak">Série</div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="mode-bar">
+      <span class="mode-label" data-t="mode_label">Mode</span>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="modeTyping" onclick="setMode('typing')">
+          ⌨️ <span data-t="mode_typing">Clavier</span>
+        </button>
+        <button class="lang-btn" id="modePaper" onclick="setMode('paper')">
+          ✏️ <span data-t="mode_paper">Papier</span>
+        </button>
+      </div>
+      <span class="mode-desc" id="modeDesc"></span>
+    </div>
+
+    <!-- Training card -->
+    <div class="card">
+      <div class="training-zone">
+        <div id="trainStatus" class="card-title" style="justify-content:center; margin-bottom:6px;"></div>
+
+        <div class="word-display word-hidden" id="wordDisplay"></div>
+        <div class="hint-row" id="hintRow"></div>
+
+        <input type="text" class="spelling-input" id="spellingInput"
+          autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+          placeholder="—">
+
+        <!-- Paper mode self-evaluation -->
+        <div id="paperPrompt" class="paper-prompt" style="display:none;">
+          <div class="paper-prompt-text" data-t="paper_prompt">As-tu bien écrit le mot sur ton papier ?</div>
+          <div class="paper-prompt-btns">
+            <button class="btn btn-correct" onclick="paperResult(true)">
+              ✅ <span data-t="paper_correct">Correct !</span>
+            </button>
+            <button class="btn btn-wrong" onclick="paperResult(false)">
+              ❌ <span data-t="paper_wrong">Erreur</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="result-banner" id="resultBanner"></div>
+
+        <div class="training-actions">
+          <button class="btn btn-primary" id="btnSpeak" onclick="speakCurrent()" disabled>
+            🔊 <span data-t="btn_speak">Écouter</span>
+          </button>
+          <button class="btn btn-ghost" id="btnHint" onclick="showHint()" disabled>
+            💡 <span data-t="btn_hint">Indice</span>
+          </button>
+          <button class="btn btn-secondary" id="btnCheck" onclick="checkSpelling()" disabled>
+            ✓ <span data-t="btn_check">Vérifier</span>
+          </button>
+        </div>
+        <div class="training-actions" style="margin-top:8px;">
+          <button class="btn btn-accent" id="btnNext" onclick="nextWord()">
+            ▶ <span id="btnNextLabel" data-t="btn_start">Commencer</span>
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="resetSession()" data-t="btn_reset_session">Réinitialiser</button>
+          <button class="btn btn-sm" id="btnRetry" onclick="retryWord()"
+            style="display:none; background:#ff6b6b; color:white; box-shadow:0 4px 12px rgba(255,107,107,0.3);">
+            👁 <span data-t="btn_retry">J'ai compris → Mot suivant</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini list status -->
+    <div class="card" id="miniStatusCard" style="display:none;">
+      <div class="card-title">📋 <span data-t="pool_status">État de la liste</span></div>
+      <div id="miniStatusContent"></div>
+    </div>
+
+  </div><!-- end tab-train -->
+
+  <!-- ═══ TAB: WORDS ═══ -->
+  <div class="tab-panel" id="tab-words">
+
+    <div class="card">
+      <div class="card-title">➕ <span data-t="add_words">Ajouter des mots</span></div>
+      <div class="bulk-label" data-t="bulk_add">Ajouter plusieurs mots (un par ligne) :</div>
+      <textarea class="input-field" id="bulkInput" rows="3" placeholder="chat&#10;chien&#10;maison"></textarea>
+      <div class="action-row" style="margin-top:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="addBulk()">
+          <span data-t="btn_add_all">Tout ajouter</span>
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulkInput').value=''">
+          <span data-t="btn_clear">Effacer</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        📋 <span data-t="word_list">Liste des mots</span>
+        <span id="wordCount" class="word-count"></span>
+      </div>
+      <div id="wordChips" class="word-chips"></div>
+      <div class="action-row">
+        <select class="list-select" id="predefinedListSelect" onchange="loadPredefinedList(this.value)">
+          <option value="" data-t="select_list_placeholder">📂 Charger une liste…</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="clearAllWords()" data-t="btn_clear_all">Tout effacer</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportWords()" data-t="btn_export">⬆ Exporter</button>
+      </div>
+    </div>
+
+  </div><!-- end tab-words -->
+
+  <!-- ═══ TAB: STATS ═══ -->
+  <div class="tab-panel" id="tab-stats">
+
+    <div class="card">
+      <div class="card-title">🏆 <span data-t="session_stats">Statistiques de session</span></div>
+      <div class="score-bar" style="margin-bottom:0;">
+        <div class="score-card ok">
+          <div class="score-num" id="statOk">0</div>
+          <div class="score-label" data-t="score_correct">Corrects</div>
+        </div>
+        <div class="score-card fail">
+          <div class="score-num" id="statFail">0</div>
+          <div class="score-label" data-t="score_wrong">Erreurs</div>
+        </div>
+        <div class="score-card total">
+          <div class="score-num" id="statPct">—</div>
+          <div class="score-label" data-t="score_pct">Score</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-toggle">
+        <div class="card-title" style="margin-bottom:0;">✅ <span data-t="correct_words">Mots réussis</span></div>
+      </div>
+      <div class="stats-list" id="correctList"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-toggle">
+        <div class="card-title" style="margin-bottom:0;">❌ <span data-t="wrong_words">Mots à retravailler</span></div>
+      </div>
+      <div class="stats-list" id="wrongList"></div>
+    </div>
+
+    <div class="action-row" style="margin-bottom:16px;">
+      <button class="btn btn-ghost btn-sm" onclick="resetSession()" data-t="btn_reset_session">Réinitialiser</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearSavedSession()" data-t="btn_clear_saved">Effacer sauvegarde</button>
+    </div>
+
+    <!-- Voice diagnostics -->
+    <div class="card">
+      <div class="card-title">🔊 Voix disponibles sur cet appareil</div>
+      <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px;">
+        Cliquez sur une voix pour la tester avec "porte". Choisissez ensuite la voix souhaitée ci-dessous.
+      </div>
+      <div id="voiceList" style="display:flex; flex-direction:column; gap:5px; max-height:300px; overflow-y:auto;"></div>
+      <div style="margin-top:12px; font-size:0.85rem; font-weight:700; color:var(--text-muted);" id="selectedVoiceInfo"></div>
+    </div>
+
+  </div><!-- end tab-stats -->
+
+</div><!-- .app -->
+
+<script src="app.js"></script>
+</body>
+</html>
