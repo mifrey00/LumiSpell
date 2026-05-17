@@ -158,8 +158,9 @@ let currentWord  = null;
 let currentState = 'idle';
 let session      = { ok: 0, fail: 0, streak: 0, history: [] };
 let hintLevel    = 0;
-let nextWordTimer = null;
-let notifTimer   = null;
+let nextWordTimer    = null;
+let notifTimer       = null;
+let currentStatusKey = 'status_ready';
 const speechSynth = window.speechSynthesis;
 
 // ── Add more lists here: { label, file } ──────────────────────────────────────
@@ -208,7 +209,7 @@ function init() {
   renderWords();
   updateScoreUI();
   updateStats();
-  setTrainStatus(t('status_ready'));
+  setTrainStatus('status_ready');
   updateMiniStatus();
 }
 
@@ -278,6 +279,7 @@ function applyLang() {
   applyVoiceLang();
   applyMode();
   document.getElementById('spellingInput').placeholder = t('input_placeholder');
+  if (currentStatusKey) setTrainStatus(currentStatusKey);
 }
 
 function setVoiceLang(l) {
@@ -485,7 +487,7 @@ function nextWord() {
 
   if (pool.length === 0) {
     if (words.every(w => w.correct)) {
-      setTrainStatus(t('list_done'));
+      setTrainStatus('list_done');
       document.getElementById('btnNext').textContent = '🔄 ' + t('btn_start');
       words.forEach(w => { w.correct = false; w.attempts = 0; });
       saveWords();
@@ -512,7 +514,7 @@ function nextWord() {
   document.getElementById('btnRetry').style.display       = 'none';
   document.getElementById('btnNextLabel').textContent     = t('btn_next');
 
-  setTrainStatus(t('status_listen'));
+  setTrainStatus('status_listen');
   speakWord(parsed.spoken);
   if (trainingMode === 'typing') document.getElementById('spellingInput').focus();
   updateMiniStatus();
@@ -657,11 +659,13 @@ function resetTrainUI() {
   document.getElementById('btnRetry').style.display        = 'none';
   document.getElementById('paperPrompt').style.display     = 'none';
   document.getElementById('btnNextLabel').textContent      = t('btn_start');
-  setTrainStatus(t('status_ready'));
+  setTrainStatus('status_ready');
 }
 
-function setTrainStatus(msg) {
-  document.getElementById('trainStatus').textContent = msg;
+function setTrainStatus(keyOrMsg) {
+  currentStatusKey = T[lang]?.[keyOrMsg] !== undefined ? keyOrMsg : null;
+  document.getElementById('trainStatus').textContent =
+    currentStatusKey ? t(currentStatusKey) : keyOrMsg;
 }
 
 // ══════════════════════════════════════
