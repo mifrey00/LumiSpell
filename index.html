@@ -171,14 +171,14 @@
         📋 <span data-t="word_list">Liste des mots</span>
         <span id="wordCount" class="word-count"></span>
       </div>
-      <div id="wordChips" class="word-chips"></div>
-      <div class="action-row">
+      <div class="action-row" style="margin-bottom:12px;">
         <select class="list-select" id="predefinedListSelect" onchange="loadPredefinedList(this.value)">
           <option value="" data-t="select_list_placeholder">📂 Charger une liste…</option>
         </select>
         <button class="btn btn-ghost btn-sm" onclick="clearAllWords()" data-t="btn_clear_all">Tout effacer</button>
         <button class="btn btn-ghost btn-sm" onclick="exportWords()" data-t="btn_export">⬆ Exporter</button>
       </div>
+      <div id="wordChips" class="word-chips"></div>
     </div>
 
   </div><!-- end tab-words -->
@@ -225,9 +225,9 @@
 
     <!-- Voice diagnostics -->
     <div class="card">
-      <div class="card-title">🔊 Voix disponibles sur cet appareil</div>
-      <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px;">
-        Cliquez sur une voix pour la tester avec "porte". Choisissez ensuite la voix souhaitée ci-dessous.
+      <div class="card-title">🔊 <span data-t="voices_available">Voix disponibles sur cet appareil</span></div>
+      <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px;" data-t="voices_test_desc">
+        Cliquez sur une voix pour la tester (🇫🇷 "grenouille" · 🇬🇧 "squirrel"). Choisissez ensuite la voix souhaitée ci-dessous.
       </div>
       <div id="voiceList" style="display:flex; flex-direction:column; gap:5px; max-height:300px; overflow-y:auto;"></div>
       <div style="margin-top:12px; font-size:0.85rem; font-weight:700; color:var(--text-muted);" id="selectedVoiceInfo"></div>

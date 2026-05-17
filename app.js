@@ -56,6 +56,22 @@ const T = {
     paper_wrong:      "Erreur",
     voice_lang_label: "Langue des mots",
     ui_lang_label:    "Interface",
+    words_unit:       "mots",
+    words_added:      "mots ajoutés",
+    no_words_yet:     "Aucun mot pour l'instant.",
+    save_cleared:     "Sauvegarde effacée",
+    none_yet:         "Aucun encore",
+    mastered:         "maîtrisés",
+    no_voices:        "Aucune voix trouvée. Essayez de recharger la page.",
+    voice_network:    "réseau",
+    voice_local:      "local",
+    voice_selected_fr:"voix FR choisie",
+    voice_selected_en:"voix EN choisie",
+    voice_set:        "Voix",
+    file_not_found:   "introuvable",
+    voices_available: "Voix disponibles sur cet appareil",
+    voices_test_desc: "Cliquez sur une voix pour la tester (🇫🇷 \"grenouille\" · 🇬🇧 \"squirrel\"). Choisissez ensuite la voix souhaitée ci-dessous.",
+    select_list_placeholder: "📂 Charger une liste…",
   },
   en: {
     tab_train:        "Training",
@@ -111,6 +127,22 @@ const T = {
     paper_wrong:      "Wrong",
     voice_lang_label: "Word language",
     ui_lang_label:    "Interface",
+    words_unit:       "words",
+    words_added:      "words added",
+    no_words_yet:     "No words yet.",
+    save_cleared:     "Save cleared",
+    none_yet:         "None yet",
+    mastered:         "mastered",
+    no_voices:        "No voices found. Try reloading the page.",
+    voice_network:    "network",
+    voice_local:      "local",
+    voice_selected_fr:"FR voice selected",
+    voice_selected_en:"EN voice selected",
+    voice_set:        "Voice",
+    file_not_found:   "not found",
+    voices_available: "Available voices on this device",
+    voices_test_desc: "Click a voice to test it (🇫🇷 \"grenouille\" · 🇬🇧 \"squirrel\"). Then select the voice you want below.",
+    select_list_placeholder: "📂 Load a list…",
   }
 };
 
@@ -360,7 +392,7 @@ function addBulk() {
   lines.forEach(l => { if (addWord(l)) count++; });
   document.getElementById('bulkInput').value = '';
   updateMiniStatus();
-  showNotif(`+${count} ${lang === 'fr' ? 'mots ajoutés' : 'words added'}`);
+  showNotif(`+${count} ${t('words_added')}`);
 }
 
 function deleteWord(word) {
@@ -410,7 +442,7 @@ async function loadPredefinedList(file) {
     updateMiniStatus();
     showNotif(t('loaded'));
   } catch (e) {
-    showNotif('⚠️ ' + file + ' introuvable');
+    showNotif('⚠️ ' + file + ' ' + t('file_not_found'));
   }
 }
 
@@ -422,11 +454,11 @@ function exportWords() {
 function renderWords() {
   const container = document.getElementById('wordChips');
   document.getElementById('wordCount').textContent =
-    `${words.length} ${lang === 'fr' ? 'mots' : 'words'}`;
+    `${words.length} ${t('words_unit')}`;
 
   if (words.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="emoji">📝</div>
-      <p>${lang === 'fr' ? 'Aucun mot pour l\'instant.' : 'No words yet.'}</p></div>`;
+      <p>${t('no_words_yet')}</p></div>`;
     return;
   }
   container.innerHTML = '';
@@ -667,7 +699,7 @@ function resetSession() {
 
 function clearSavedSession() {
   localStorage.removeItem(STORAGE_SESSION);
-  showNotif(lang === 'fr' ? 'Sauvegarde effacée' : 'Save cleared');
+  showNotif(t('save_cleared'));
 }
 
 // ══════════════════════════════════════
@@ -681,7 +713,7 @@ function updateStats() {
 
   const correct = words.filter(w => w.correct);
   const wrong   = words.filter(w => !w.correct && w.attempts > 0);
-  const none    = `<div style="color:var(--text-muted);font-size:0.9rem;padding:6px;">${lang === 'fr' ? 'Aucun encore' : 'None yet'}</div>`;
+  const none    = `<div style="color:var(--text-muted);font-size:0.9rem;padding:6px;">${t('none_yet')}</div>`;
 
   document.getElementById('correctList').innerHTML = correct.length === 0 ? none :
     correct.map(w => `<div class="stat-row">
@@ -703,8 +735,8 @@ function updateMiniStatus() {
   const done = words.filter(w => w.correct).length;
   document.getElementById('miniStatusContent').innerHTML = `
     <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.9rem;font-weight:700;">
-      <span style="color:var(--primary)">📚 ${words.length} ${lang === 'fr' ? 'mots' : 'words'}</span>
-      <span style="color:var(--success)">✅ ${done} ${lang === 'fr' ? 'maîtrisés' : 'mastered'}</span>
+      <span style="color:var(--primary)">📚 ${words.length} ${t('words_unit')}</span>
+      <span style="color:var(--success)">✅ ${done} ${t('mastered')}</span>
       <span style="color:var(--secondary-dark)">🎯 ${pool.length} ${t('words_left')}</span>
     </div>`;
 }
@@ -754,7 +786,7 @@ function renderVoiceList() {
   if (!container) return;
   const voices = speechSynth.getVoices();
   if (!voices.length) {
-    container.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;">Aucune voix trouvée. Essayez de recharger la page.</div>';
+    container.innerHTML = `<div style="color:var(--text-muted);font-size:0.85rem;">${t('no_voices')}</div>`;
     return;
   }
   manualVoiceName.fr = localStorage.getItem(STORAGE_VOICE_FR) || null;
@@ -774,9 +806,9 @@ function renderVoiceList() {
       <div style="flex:1;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:0.8rem;font-weight:700;
         ${isFr ? 'background:#e6faf0;border-color:#51cf66;' : isEn ? 'background:#e8f4ff;border-color:#74b9ff;' : ''}">
         ${tag} <span style="color:var(--text)">${v.name}</span>
-        <span style="color:var(--text-muted);font-weight:400;margin-left:4px;">${v.lang}${v.localService ? ' · local' : ' · réseau'}</span>
-        ${isSelectedFr ? ' <span style="color:#1a7a36;font-size:0.75rem;">✅ voix FR choisie</span>' : ''}
-        ${isSelectedEn ? ' <span style="color:#1a55a0;font-size:0.75rem;">✅ voix EN choisie</span>' : ''}
+        <span style="color:var(--text-muted);font-weight:400;margin-left:4px;">${v.lang}${v.localService ? ' · ' + t('voice_local') : ' · ' + t('voice_network')}</span>
+        ${isSelectedFr ? ` <span style="color:#1a7a36;font-size:0.75rem;">✅ ${t('voice_selected_fr')}</span>` : ''}
+        ${isSelectedEn ? ` <span style="color:#1a55a0;font-size:0.75rem;">✅ ${t('voice_selected_en')}</span>` : ''}
       </div>
       <button class="btn btn-ghost btn-sm" style="font-size:0.75rem;padding:4px 10px;"
         onclick="testVoice('${v.name.replace(/'/g, "\\'")}')">▶ Tester</button>
@@ -793,7 +825,8 @@ function testVoice(name) {
   const voice = speechSynth.getVoices().find(v => v.name === name);
   if (!voice) return;
   speechSynth.cancel();
-  const utt = new SpeechSynthesisUtterance('porte');
+  const testWord = voice.lang.startsWith('fr') ? 'grenouille' : 'squirrel';
+  const utt = new SpeechSynthesisUtterance(testWord);
   utt.voice = voice; utt.lang = voice.lang; utt.rate = 0.82;
   speechSynth.speak(utt);
 }
@@ -802,14 +835,14 @@ function selectVoice(name, langKey) {
   manualVoiceName[langKey] = name;
   localStorage.setItem(langKey === 'fr' ? STORAGE_VOICE_FR : STORAGE_VOICE_EN, name);
   renderVoiceList();
-  showNotif('✅ Voix ' + langKey.toUpperCase() + ' : ' + name);
+  showNotif('✅ ' + t('voice_set') + ' ' + langKey.toUpperCase() + ' : ' + name);
 }
 
 function updateSelectedVoiceInfo() {
   const el = document.getElementById('selectedVoiceInfo');
   if (!el) return;
-  el.innerHTML = `🇫🇷 Voix FR : <strong>${manualVoiceName.fr || '(auto)'}</strong>
-    &nbsp;|&nbsp; 🇬🇧 Voix EN : <strong>${manualVoiceName.en || '(auto)'}</strong>`;
+  el.innerHTML = `🇫🇷 ${t('voice_set')} FR : <strong>${manualVoiceName.fr || '(auto)'}</strong>
+    &nbsp;|&nbsp; 🇬🇧 ${t('voice_set')} EN : <strong>${manualVoiceName.en || '(auto)'}</strong>`;
 }
 
 // ══════════════════════════════════════
